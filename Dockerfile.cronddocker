@@ -1,0 +1,8 @@
+FROM docker AS build
+
+RUN mkdir -p /out/bin && \
+  cp /usr/local/bin/docker /out/bin/docker
+
+FROM pratikmallya/crond
+WORKDIR /
+COPY --from=build /out /

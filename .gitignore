@@ -1,0 +1,6 @@
+# Folders
+vendor
+.idea
+*.DS_STORE
+default.etcd/
+.vscode/*
