@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"sync"
 
 	"github.com/gin-gonic/gin"
 )
@@ -26,14 +25,14 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		cronEntry := fmt.Sprintf("%s root docker run --entrypoint %s %s", crontab.Schedule, crontab.Command, crontab.Image)
+		cronEntry := fmt.Sprintf("%s root docker run --entrypoint %s %s", crontabIN.Schedule, crontabIN.Command, crontabIN.Image)
 		crontabf := base32.StdEncoding.EncodeToString([]byte(cronEntry))
-		err = os.Stat(crontabf)
+		_, err = os.Stat(crontabf)
 		if err == nil {
 			c.JSON(200, gin.H{})
 			return
 		}
-		err := ioutil.WriteFile(fmt.Sprintf("/opt/crond/crontabs/%s", crontabf), []byte(cronEntry), 0644)
+		err = ioutil.WriteFile(fmt.Sprintf("/opt/crond/crontabs/%s", crontabf), []byte(cronEntry), 0644)
 		if err != nil {
 			panic(err)
 		}
@@ -72,5 +71,5 @@ func main() {
 		c.JSON(204, gin.H{})
 	})
 
-	r.Run() // listen and serve on 0.0.0.0:8080
+	router.Run() // listen and serve on 0.0.0.0:8080
 }
