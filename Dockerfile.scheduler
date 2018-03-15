@@ -1,6 +1,8 @@
+FROM docker AS docker-cli
 # this Dockerfile is based on: https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#use-multi-stage-builds
 FROM golang:1.9.2-alpine3.6 AS build
 
+WORKDIR /go/src/github.com/pratikmallya/schedule-docker-tasks
 # Install tools required to build the project
 # We need to run `docker build --no-cache .` to update those dependencies
 RUN apk add --no-cache git
@@ -8,19 +10,19 @@ RUN go get github.com/golang/dep/cmd/dep
 
 # Gopkg.toml and Gopkg.lock lists project dependencies
 # These layers are only re-built when Gopkg files are updated
-COPY Gopkg.lock Gopkg.toml /go/src/project/
-WORKDIR /go/src/project/
+COPY Gopkg.lock Gopkg.toml /go/src/github.com/pratikmallya/schedule-docker-tasks/
 # Install library dependencies
 RUN dep ensure -vendor-only
 
 # Copy all project and build it
 # This layer is rebuilt when ever a file has changed in the project directory
-COPY main.go /go/src/project/
+COPY . .
 # The CGO_ENABLED GOOS and GOARCH flags are required when building on docker on mac
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /bin/project
-RUN chmod +x /bin/project
+RUN cd server && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /bin/scheduler
+RUN chmod +x /bin/scheduler
 
 # This results in a single layer image
 FROM scratch
-COPY --from=build /bin/project /bin/project
-ENTRYPOINT ["/bin/project"]
+COPY --from=build /bin/scheduler /bin/scheduler
+COPY --from=docker-cli /usr/local/bin/docker /bin/docker
+ENTRYPOINT ["/bin/scheduler"]
