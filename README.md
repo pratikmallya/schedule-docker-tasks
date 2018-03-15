@@ -36,7 +36,25 @@ docker run --rm pratikmallya/scheduler -d
 * the cli can be run like so:
 
 ```
-docker run pratikmallya/scheduler-cli -h
+$ docker run pratikmallya/scheduler-cli -h
+Use this cli to talk to the scheduler
+
+Usage:
+  task [command]
+
+Available Commands:
+  create      create a new task
+  delete      Delete task with id
+  help        Help about any command
+  list        List all available tasks
+
+Flags:
+  -h, --help          help for task
+  -i, --ip string     IP of scheduler (default "0.0.0.0")
+  -p, --port string   Port of scheduler (default "8080")
+
+Use "task [command] --help" for more information about a command.
 ```
-as environment variables pointing to the server. Note that the k8s template
-deploys a NodePort service so make sure to use that port instead of `8080`.
+
+Note that the k8s template deploys a NodePort service so make sure to use that
+port instead of `8080`.
