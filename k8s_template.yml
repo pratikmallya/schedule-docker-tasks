@@ -13,7 +13,7 @@ spec:
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: scheduler-deployment
+  name: scheduler
   labels:
     app: scheduler
 spec:
@@ -29,6 +29,8 @@ spec:
       - name: scheduler-opt
         hostPath:
           path: /opt/crond
+      - name: docker-graph-storage
+        emptyDir: {}
       initContainers:
       - name: init-opt
         image: alpine
@@ -39,11 +41,16 @@ spec:
             mountPath: /opt/crond/
       containers:
       - name: crond
-        image: pratikmallya/cronddocker
+        image: docker
+        command: ["sleep"]
+        args: ["60000"]
         imagePullPolicy: Always
         volumeMounts:
           - name: scheduler-opt
             mountPath: /opt/crond/
+        env:
+          - name: DOCKER_HOST
+            value: tcp://localhost:2375
       - name: api
         image: pratikmallya/scheduler
         imagePullPolicy: Always
@@ -52,3 +59,14 @@ spec:
         volumeMounts:
           - name: scheduler-opt
             mountPath: /opt/crond/
+      - name: dind-daemon
+        image: docker:1.12.6-dind
+        resources:
+            requests:
+                cpu: 20m
+                memory: 512Mi
+        securityContext:
+            privileged: true
+        volumeMounts:
+          - name: docker-graph-storage
+            mountPath: /var/lib/docker
