@@ -3,28 +3,37 @@ Service to schedule simple docker-based tasks
 
 ## Architecture
 
-* REST API service that essentially validates API requests and configures the
-crontab
+* REST API service that essentially validates API requests and schedules task
 * tasks are simple `(schedule, image, command)` tuples
-* They are run as: `docker run --entrypoint command image` on the given
+* They are run as: `docker run --rm --entrypoint command image` on the given
 schedule
-
-## Notes
-
 * only simple, short-running docker tasks should be scheduled
-* designed to be run in kubernetes with dind. Deploy on k8s like so:
+
+
+## Running
+
+### On Kubernetes
+This is the recommended way. Deploy on k8s like so:
 
 ```
 kubectl apply -f k8s_template.yml
 ```
 
-* the cli is deployed in the pod. Access it like so:
+### Locally
+* The container essentially needs to talk to a docker daemon, so you can
+run it locally as well. Warning: this might lead to flood of docker containers
+if many tasks are being scheduled
+
+* Run it like so:
 ```
-kubectl exec -it <POD_NAME> -c cli -h
+docker run --rm pratikmallya/scheduler -d
+
+
+## Talking to the Server
+* Currently runs with no auth
+* the cli can be run like so:
 ```
-It can also be run from outside the pod:
-```
-docker run -e "$SCHEDULER_HOST_IP" -e "$SCHEDULER_HOST_PORT" pratikmallya/scheduler-cli -h
+docker run pratikmallya/scheduler-cli -h
 ```
 as environment variables pointing to the server. Note that the k8s template
 deploys a NodePort service so make sure to use that port instead of `8080`.

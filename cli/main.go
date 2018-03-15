@@ -51,7 +51,7 @@ var create = &cobra.Command{
     }
     defer resp.Body.Close()
     body, err := ioutil.ReadAll(resp.Body)
-    fmt.Println(body)
+    fmt.Println(string(body))
   },
 }
 
@@ -63,6 +63,9 @@ var list = &cobra.Command{
     resp, err := http.Get(fmt.Sprintf("http://%s:%s/v1/tasks", hostIP, hostPort))
     if err != nil {
       panic(err)
+    }
+    if resp.StatusCode != http.StatusOK {
+      panic(fmt.Sprintf("Got %d from server", resp.StatusCode))
     }
     defer resp.Body.Close()
     body, err := ioutil.ReadAll(resp.Body)
