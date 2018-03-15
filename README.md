@@ -22,13 +22,14 @@ kubectl apply -f k8s_template.yml
 
 ### Locally
 * The container essentially needs to talk to a docker daemon, so you can
-run it locally as well. Warning: this might lead to flood of docker containers
-if many tasks are being scheduled
+run it locally as well. You do need to bind mount the socket file used to talk
+the the daemon. Warning: this might lead to flood of docker containers on your
+machine if many tasks are being scheduled
 
 * Run it like so:
 
 ```
-docker run --rm pratikmallya/scheduler -d
+docker run --rm -p 8080:8080 -v /var/run/docker.sock:/var/run/docker.sock pratikmallya/scheduler
 ```
 
 ## Talking to the Server
