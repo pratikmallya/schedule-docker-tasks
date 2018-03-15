@@ -45,11 +45,13 @@ spec:
             mountPath: /opt/crond/
       containers:
       - name: crond
-        image: docker
+        image: pratikmallya/cronddocker
         imagePullPolicy: Always
         volumeMounts:
           - name: scheduler-opt
             mountPath: /opt/crond/
+        command: ["/bin/crond"]
+        args: ["-f", "-c", "/opt/crond/crontabs", "-L", "/dev/stdout", "-l", "0"]
         env:
           - name: DOCKER_HOST
             value: tcp://localhost:2375
