@@ -15,7 +15,7 @@ RUN dep ensure -vendor-only
 
 # Copy all project and build it
 # This layer is rebuilt when ever a file has changed in the project directory
-COPY . /go/src/project/
+COPY main.go /go/src/project/
 # The CGO_ENABLED GOOS and GOARCH flags are required when building on docker on mac
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /bin/project
 RUN chmod +x /bin/project
