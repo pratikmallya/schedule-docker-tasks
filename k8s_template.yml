@@ -35,13 +35,6 @@ spec:
         env:
           - name: DOCKER_HOST
             value: tcp://localhost:2375
-      - name: cli
-        image: pratikmallya/scheduler-cli
-        command: ["sleep"]
-        args: ["6000000"]
-        env:
-          - name: DOCKER_HOST
-            value: tcp://localhost:2375
       - name: dind-daemon
         image: docker:1.12.6-dind
         resources:

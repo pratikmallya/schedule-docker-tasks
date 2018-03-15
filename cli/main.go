@@ -39,7 +39,7 @@ var create = &cobra.Command{
     if err != nil {
       panic(err)
     }
-    req, err := http.NewRequest("POST", fmt.Sprintf("http://{hostIP}:{hostPort}/v1/tasks", hostIP, hostPort), bytes.NewBuffer(b))
+    req, err := http.NewRequest("POST", fmt.Sprintf("http://%s:%s/v1/tasks", hostIP, hostPort), bytes.NewBuffer(b))
     if err != nil {
       panic(err)
     }
@@ -60,7 +60,7 @@ var list = &cobra.Command{
   Short: "List all available tasks",
   Args: cobra.NoArgs,
   Run: func(cmd *cobra.Command, args []string) {
-    resp, err := http.Get(fmt.Sprintf("http://{hostIP}:{hostPort}/v1/tasks", hostIP, hostPort))
+    resp, err := http.Get(fmt.Sprintf("http://%s:%s/v1/tasks", hostIP, hostPort))
     if err != nil {
       panic(err)
     }
@@ -69,7 +69,7 @@ var list = &cobra.Command{
     if err != nil {
       panic(err)
     }
-    fmt.Println(body)
+    fmt.Println(string(body))
   },
 }
 
@@ -79,7 +79,7 @@ var delete = &cobra.Command{
   Args: cobra.ExactArgs(1),
   Run: func(cmd *cobra.Command, args []string) {
     fmt.Printf("Deleting task with id: %s", args[0])
-    req, err := http.NewRequest("DELETE", fmt.Sprintf("http://{hostIP}:{hostPort}/v1/tasks/{id}",hostIP, hostPort, args[0]), nil)
+    req, err := http.NewRequest("DELETE", fmt.Sprintf("http://%s:%s/v1/tasks/{id}",hostIP, hostPort, args[0]), nil)
     client := &http.Client{}
     resp, err := client.Do(req)
     if err != nil {
