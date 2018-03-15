@@ -1,75 +1,72 @@
 package main
 
 import (
-	"encoding/base32"
 	"fmt"
-	"io/ioutil"
-	"os"
+	"os/exec"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"golang.org/x/net/context"
+	"gopkg.in/robfig/cron.v2"
 )
 
-type crontab struct {
+type dockerCrontab struct {
 	Schedule string `json:"schedule" binding:"required"`
 	Command  string `json:"command" binding:"required"`
 	Image    string `json:"image" binding:"required"`
 }
 
+func (d dockerCrontab) parse() (cron.Schedule, error) {
+	return cron.Parse(d.Schedule)
+}
+
+func (d dockerCrontab) Run() {
+	ctx := context.Background()
+	cmd := exec.CommandContext(ctx, "docker", "run", "--entrypoint", fmt.Sprintf("%s", d.Command), fmt.Sprintf("%s", d.Image))
+	cmd.Output()
+}
+
 func main() {
 	router := gin.Default()
-
+	crond := cron.New()
 	// create task
 	router.POST("/v1/tasks", func(c *gin.Context) {
-		var crontabIN crontab
+		var crontabIN dockerCrontab
+
 		err := c.BindJSON(&crontabIN)
 		if err != nil {
 			panic(err)
 		}
-		crontabf := base32.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s.%s.%s", crontabIN.Schedule, crontabIN.Image, crontabIN.Command)))
-		cronEntry := fmt.Sprintf("%s root docker run --entrypoint %s %s >>/opt/crond/logs/%s.log 2>&1", crontabIN.Schedule, crontabIN.Command, crontabIN.Image, crontabf)
-		_, err = os.Stat(crontabf)
-		if err == nil {
-			c.JSON(200, gin.H{})
-			return
-		}
-		err = ioutil.WriteFile(fmt.Sprintf("/opt/crond/crontabs/%s", crontabf), []byte(cronEntry), 0644)
+		sched, err := crontabIN.parse()
 		if err != nil {
 			panic(err)
 		}
-		c.JSON(201, gin.H{"id": crontabf})
+		id := crond.Schedule(sched, crontabIN)
+		c.JSON(201, gin.H{"id": id})
 	})
 
 	// list tasks
 	router.GET("/v1/tasks", func(c *gin.Context) {
-		taskFiles, err := ioutil.ReadDir("/opt/crond/crontabs/")
-		if err != nil {
-			panic(err)
-		}
 		var tasks []string
-		for i := range taskFiles {
-			tasks = append(tasks, taskFiles[i].Name())
+		entries := crond.Entries()
+		for i := range entries {
+			crontabIN := entries[i].Job.(*dockerCrontab)
+			tasks = append(tasks, fmt.Sprintf("%s %s %s", crontabIN.Schedule, crontabIN.Image, crontabIN.Command))
 		}
 		c.JSON(201, gin.H{"tasks": tasks})
 	})
 
 	// delete specific task
 	router.DELETE("/v1/tasks/:taskid", func(c *gin.Context) {
-		taskID := c.Param("taskid")
-		err := os.Remove(fmt.Sprintf("/opt/crond/crontabs/%s", taskID))
+		taskIDs := c.Param("taskid")
+		taskIDi, err := strconv.Atoi(taskIDs)
 		if err != nil {
 			panic(err)
 		}
-		c.JSON(204, gin.H{})
+		crond.Remove(cron.EntryID(taskIDi))
+		c.JSON(200, gin.H{})
 	})
 
-	// delete all tasks
-	router.DELETE("/v1/tasks", func(c *gin.Context) {
-		err := os.RemoveAll("/opt/crond/crontabs/")
-		if err != nil {
-			panic(err)
-		}
-		c.JSON(204, gin.H{})
-	})
-
+	crond.Start()
 	router.Run() // listen and serve on 0.0.0.0:8080
 }

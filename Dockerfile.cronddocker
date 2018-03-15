@@ -1,3 +1,0 @@
-FROM docker AS build
-FROM pratikmallya/crond
-COPY --from=build /usr/local/bin/docker /bin/docker

@@ -26,43 +26,17 @@ spec:
         app: scheduler
     spec:
       volumes:
-      - name: scheduler-opt
-        hostPath:
-          path: /opt/crond
       - name: docker-graph-storage
         emptyDir: {}
-      initContainers:
-      - name: init-opt
-        image: alpine
-        command: ["/bin/sh"]
-        args:
-          - "-c"
-          - |
-            mkdir -p /opt/crond/crontabs
-            mkdir -p /opt/crond/logs
-        volumeMounts:
-          - name: scheduler-opt
-            mountPath: /opt/crond/
       containers:
-      - name: crond
-        image: pratikmallya/cronddocker
-        imagePullPolicy: Always
-        volumeMounts:
-          - name: scheduler-opt
-            mountPath: /opt/crond/
-        command: ["/bin/crond"]
-        args: ["-f", "-c", "/opt/crond/crontabs", "-L", "/dev/stdout", "-l", "0"]
-        env:
-          - name: DOCKER_HOST
-            value: tcp://localhost:2375
-      - name: api
+      - name: scheduler
         image: pratikmallya/scheduler
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
-        volumeMounts:
-          - name: scheduler-opt
-            mountPath: /opt/crond/
+        env:
+          - name: DOCKER_HOST
+            value: tcp://localhost:2375
       - name: dind-daemon
         image: docker:1.12.6-dind
         resources:
