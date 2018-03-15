@@ -1,12 +1,13 @@
 package lib
 
 import (
-  "os/exec"
-  "fmt"
+	"fmt"
+	"os/exec"
 
-  "gopkg.in/robfig/cron.v2"
-  "golang.org/x/net/context"
+	"golang.org/x/net/context"
+	"gopkg.in/robfig/cron.v2"
 )
+
 // Task is a struct for holding task create data
 type Task struct {
 	Schedule string `json:"schedule" binding:"required"`
