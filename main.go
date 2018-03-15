@@ -19,7 +19,7 @@ func main() {
 	router := gin.Default()
 
 	// create task
-	router.POST("/tasks", func(c *gin.Context) {
+	router.POST("/v1/tasks", func(c *gin.Context) {
 		var crontabIN crontab
 		err := c.BindJSON(&crontabIN)
 		if err != nil {
@@ -40,7 +40,7 @@ func main() {
 	})
 
 	// list tasks
-	router.GET("/tasks", func(c *gin.Context) {
+	router.GET("/v1/tasks", func(c *gin.Context) {
 		taskFiles, err := ioutil.ReadDir("/opt/crond/crontabs/")
 		if err != nil {
 			panic(err)
@@ -53,7 +53,7 @@ func main() {
 	})
 
 	// delete specific task
-	router.DELETE("/tasks/:taskid", func(c *gin.Context) {
+	router.DELETE("/v1/tasks/:taskid", func(c *gin.Context) {
 		taskID := c.Param("taskid")
 		err := os.Remove(fmt.Sprintf("/opt/crond/crontabs/%s", taskID))
 		if err != nil {
@@ -63,7 +63,7 @@ func main() {
 	})
 
 	// delete all tasks
-	router.DELETE("/tasks", func(c *gin.Context) {
+	router.DELETE("/v1/tasks", func(c *gin.Context) {
 		err := os.RemoveAll("/opt/crond/crontabs/")
 		if err != nil {
 			panic(err)
