@@ -25,8 +25,8 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		cronEntry := fmt.Sprintf("%s root docker run --entrypoint %s %s", crontabIN.Schedule, crontabIN.Command, crontabIN.Image)
-		crontabf := base32.StdEncoding.EncodeToString([]byte(cronEntry))
+		crontabf := base32.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s.%s.%s", crontabIN.Schedule, crontabIN.Image, crontabIN.Command)))
+		cronEntry := fmt.Sprintf("%s root docker run --entrypoint %s %s >>/opt/crond/logs/%s.log 2>&1", crontabIN.Schedule, crontabIN.Command, crontabIN.Image, crontabf)
 		_, err = os.Stat(crontabf)
 		if err == nil {
 			c.JSON(200, gin.H{})

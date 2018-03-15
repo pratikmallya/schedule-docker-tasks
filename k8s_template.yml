@@ -34,16 +34,18 @@ spec:
       initContainers:
       - name: init-opt
         image: alpine
-        command: ["mkdir"]
-        args: ["-p", "/opt/crond/crontabs"]
+        command: ["/bin/sh"]
+        args:
+          - "-c"
+          - |
+            mkdir -p /opt/crond/crontabs
+            mkdir -p /opt/crond/logs
         volumeMounts:
           - name: scheduler-opt
             mountPath: /opt/crond/
       containers:
       - name: crond
         image: docker
-        command: ["sleep"]
-        args: ["60000"]
         imagePullPolicy: Always
         volumeMounts:
           - name: scheduler-opt
