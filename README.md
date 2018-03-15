@@ -17,6 +17,7 @@ This is the recommended way. Deploy on k8s like so:
 
 ```
 kubectl apply -f k8s_template.yml
+
 ```
 
 ### Locally
@@ -25,13 +26,15 @@ run it locally as well. Warning: this might lead to flood of docker containers
 if many tasks are being scheduled
 
 * Run it like so:
+
 ```
 docker run --rm pratikmallya/scheduler -d
-
+```
 
 ## Talking to the Server
 * Currently runs with no auth
 * the cli can be run like so:
+
 ```
 docker run pratikmallya/scheduler-cli -h
 ```
