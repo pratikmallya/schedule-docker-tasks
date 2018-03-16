@@ -18,7 +18,7 @@ schedule
 This is the recommended way. Deploy on k8s like so:
 
 ```
-kubectl apply -f k8s_template.yml
+$ kubectl apply -f k8s_template.yml
 ```
 
 ### Locally
@@ -30,7 +30,7 @@ machine if many tasks are being scheduled
 * Run it like so:
 
 ```
-docker run --rm -p 8080:8080 -v /var/run/docker.sock:/var/run/docker.sock pratikmallya/scheduler
+$ docker run --rm -p 8080:8080 -v /var/run/docker.sock:/var/run/docker.sock pratikmallya/scheduler
 ```
 
 ## CLI
@@ -59,12 +59,12 @@ Use "task [command] --help" for more information about a command.
 ### Kubernetes
 You will need to specify the public IP of the Service, as well as the nodeport:
 ```
-docker run pratikmallya/scheduler-cli -i 169.60.205.31 -p 30004 list
+$ docker run pratikmallya/scheduler-cli -i 169.60.205.31 -p 30004 list
 ```
 
 ### Locally
 If running locally, specify `networking` as host:
 ```
-docker run --network host pratikmallya/scheduler-cli list
+$ docker run --network host pratikmallya/scheduler-cli list
 {"tasks":null}
 ```
