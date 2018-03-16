@@ -54,7 +54,7 @@ Flags:
   -p, --port string   Port of scheduler (default "8080")
 
 Use "task [command] --help" for more information about a command.
-```.
+```
 
 ### Kubernetes
 You will need to specify the public IP of the Service, as well as the nodeport:
