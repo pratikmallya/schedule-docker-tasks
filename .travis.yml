@@ -1,4 +1,4 @@
-language: bash
+language: go
 
 sudo: required
 
@@ -6,6 +6,7 @@ services:
   - docker
 
 script:
+  - go fmt ./...
   - ./build.sh
 
 deploy:
