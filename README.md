@@ -31,9 +31,12 @@ machine if many tasks are being scheduled
 
 ```
 docker run --rm -p 8080:8080 -v /var/run/docker.sock:/var/run/docker.sock pratikmallya/scheduler
+
 ```
 
 ## CLI
+
+A cli is provided to talk to the server.
 
 ```
 $ docker run pratikmallya/scheduler-cli -h
@@ -54,16 +57,19 @@ Flags:
   -p, --port string   Port of scheduler (default "8080")
 
 Use "task [command] --help" for more information about a command.
+
 ```.
 
 ### Kubernetes
 You will need to specify the public IP of the Service, as well as the nodeport:
+
 ```
 docker run pratikmallya/scheduler-cli -i 169.60.205.31 -p 30004 list
 ```
 
 ### Locally
 If running locally, specify `networking` as host:
+
 ```
 docker run --network host pratikmallya/scheduler-cli list
 {"tasks":null}
