@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/pratikmallya/schedule-docker-tasks.svg?branch=master)](https://travis-ci.org/pratikmallya/schedule-docker-tasks)
+
 # schedule-docker-tasks
 Service to schedule simple docker-based tasks
 
